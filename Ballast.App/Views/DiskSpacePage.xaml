@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Ballast.App.Views.DiskSpacePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Ballast.App.Controls"
+    xmlns:conv="using:Ballast.App.Converters"
+    Background="Transparent"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <conv:CountToVisibilityConverter x:Key="CountToVisibility" />
+        <conv:BytesToStringConverter x:Key="BytesToString" />
+
+        <!-- A drive segment in the picker. -->
+        <DataTemplate x:Key="DriveSegmentTemplate">
+            <ToggleButton Style="{StaticResource IosSegmentButton}"
+                          Content="{Binding Label}"
+                          IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+        </DataTemplate>
+
+        <!-- One segment of the drill-down trail. -->
+        <DataTemplate x:Key="BreadcrumbTemplate">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Style="{StaticResource IosPlainButton}"
+                        Content="{Binding Name}"
+                        Command="{Binding NavigateCommand}"
+                        CommandParameter="{Binding Node}"
+                        Padding="6,4,6,4"
+                        MinWidth="0" />
+                <FontIcon FontFamily="Segoe Fluent Icons"
+                          Glyph="&#xE76C;"
+                          FontSize="11"
+                          Foreground="{ThemeResource IosTertiaryLabelBrush}"
+                          VerticalAlignment="Center"
+                          Visibility="{Binding ShowSeparator, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+        </DataTemplate>
+
+        <!--
+            A largest-folder / largest-file row. The whole row is a button: folders drill the map
+            in, files become the Delete target, so the lists and the map behave identically.
+        -->
+        <DataTemplate x:Key="SizeEntryTemplate">
+            <StackPanel>
+                <Border Style="{StaticResource IosSeparator}" />
+                <Button Style="{StaticResource IosRowButton}"
+                        Command="{Binding ActivateCommand}"
+                        HorizontalContentAlignment="Stretch">
+                    <Grid ColumnSpacing="12" MinHeight="44">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <FontIcon Grid.Column="0"
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="{Binding Glyph}"
+                                  FontSize="15"
+                                  Foreground="{ThemeResource IosTertiaryLabelBrush}"
+                                  VerticalAlignment="Center" />
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                            <TextBlock Text="{Binding Name}"
+                                       Style="{StaticResource IosBody}"
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding Path}"
+                                       Style="{StaticResource IosCaption}"
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="CharacterEllipsis" />
+                            <ProgressBar Style="{StaticResource IosProgressBar}"
+                                         Maximum="100"
+                                         Value="{Binding PercentOfLargest}"
+                                         Margin="0,3,0,0" />
+                        </StackPanel>
+
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding SizeBytes, Converter={StaticResource BytesToString}}"
+                                   Style="{StaticResource IosHeadline}"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+                </Button>
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+        <StackPanel Margin="0,0,0,32">
+
+            <TextBlock Text="Disk Space"
+                       Style="{StaticResource IosLargeTitle}"
+                       Margin="16,20,16,2" />
+            <TextBlock Text="Find what is actually taking the room, then remove it. Deletions go to the Recycle Bin unless you ask for a permanent one."
+                       Style="{StaticResource IosFootnote}"
+                       Margin="16,0,32,20" />
+
+            <!-- ================= Drive picker + scan ================= -->
+            <controls:GroupedCard Footer="{Binding StatusText}">
+                <StackPanel>
+                    <Grid Margin="16,12,16,12" ColumnSpacing="12" MinHeight="44">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="8">
+                            <Border Style="{StaticResource IosSegmentTrack}">
+                                <ItemsControl ItemsSource="{Binding Drives}"
+                                              ItemTemplate="{StaticResource DriveSegmentTemplate}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Border>
+                            <TextBlock Text="{Binding SelectedDriveCaption}"
+                                       Style="{StaticResource IosFootnote}" />
+                            <ProgressBar Style="{StaticResource IosProgressBar}"
+                                         Maximum="100"
+                                         Value="{Binding SelectedDrivePercent}"
+                                         Margin="0,0,12,0" />
+                        </StackPanel>
+
+                        <Button Grid.Column="1"
+                                Content="Scan"
+                                Style="{StaticResource IosPrimaryButton}"
+                                Command="{Binding ScanCommand}"
+                                IsEnabled="{Binding IsIdle}"
+                                VerticalAlignment="Top"
+                                MinWidth="120" />
+
+                        <Button Grid.Column="2"
+                                Content="Stop"
+                                Style="{StaticResource IosSecondaryButton}"
+                                Command="{Binding CancelCommand}"
+                                Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}"
+                                VerticalAlignment="Top"
+                                MinWidth="90" />
+                    </Grid>
+
+                    <!-- A cloud sync mount reports an account quota, not a disk. Say so. -->
+                    <StackPanel Visibility="{Binding ShowCloudWarning, Converter={StaticResource BoolToVisibility}}">
+                        <Border Style="{StaticResource IosSeparator}" />
+                        <Grid Margin="16,11,16,11" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Grid.Column="0"
+                                      FontFamily="Segoe Fluent Icons"
+                                      Glyph="&#xE7BA;"
+                                      FontSize="16"
+                                      Foreground="{ThemeResource IosOrangeBrush}"
+                                      VerticalAlignment="Top"
+                                      Margin="0,2,0,0" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding CloudWarning}"
+                                       Style="{StaticResource IosFootnote}" />
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}">
+                        <Border Style="{StaticResource IosSeparator}" />
+                        <StackPanel Margin="16,11,16,13">
+                            <ProgressBar Style="{StaticResource IosProgressBar}"
+                                         Maximum="100"
+                                         Value="{Binding ProgressValue}"
+                                         IsIndeterminate="{Binding IsIndeterminate}" />
+                            <TextBlock Text="{Binding CurrentPath}"
+                                       Style="{StaticResource IosCaption}"
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="CharacterEllipsis"
+                                       Margin="0,8,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </controls:GroupedCard>
+
+            <!-- ================= The map ================= -->
+            <controls:GroupedCard Header="Map" Footer="{Binding MapFooter}"
+                                  Visibility="{Binding Breadcrumbs.Count, Converter={StaticResource CountToVisibility}}">
+                <StackPanel>
+
+                    <!-- Breadcrumb trail + Up. -->
+                    <Grid Margin="10,8,16,8" ColumnSpacing="6" MinHeight="44">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0"
+                                Style="{StaticResource IosPlainButton}"
+                                Command="{Binding GoUpCommand}"
+                                IsEnabled="{Binding CanGoUp}"
+                                ToolTipService.ToolTip="Up one folder"
+                                Padding="8,4,10,4"
+                                MinWidth="0">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE74A;" FontSize="12" />
+                                <TextBlock Text="Up" />
+                            </StackPanel>
+                        </Button>
+
+                        <ScrollViewer Grid.Column="1"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      HorizontalScrollMode="Auto"
+                                      VerticalScrollMode="Disabled"
+                                      VerticalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding Breadcrumbs}"
+                                          ItemTemplate="{StaticResource BreadcrumbTemplate}"
+                                          VerticalAlignment="Center">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <Border Style="{StaticResource IosSeparator}" />
+
+                    <!-- The treemap itself. -->
+                    <Border Margin="10,10,10,4"
+                            CornerRadius="8"
+                            Background="{ThemeResource IosTertiaryBackgroundBrush}">
+                        <!--
+                            Root is assigned from the code-behind, not bound. Naming a DirNode
+                            property in markup makes the XAML type-info generator emit a
+                            `new DirNode()` activator, and DirNode has required members.
+                        -->
+                        <controls:TreemapControl x:Name="Treemap"
+                                                 MaxDepth="{Binding TreemapDepth}"
+                                                 MinHeight="340" />
+                    </Border>
+
+                    <TextBlock Text="{Binding HoverText}"
+                               Style="{StaticResource IosCaption}"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"
+                               MinHeight="18"
+                               Margin="16,0,16,10" />
+                </StackPanel>
+            </controls:GroupedCard>
+
+            <!-- ================= Selection + delete ================= -->
+            <controls:GroupedCard Header="Selection"
+                                  Visibility="{Binding Breadcrumbs.Count, Converter={StaticResource CountToVisibility}}">
+                <StackPanel>
+                    <Grid Margin="16,11,16,11" ColumnSpacing="12" MinHeight="44">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <FontIcon Grid.Column="0"
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="{Binding SelectionGlyph}"
+                                  FontSize="15"
+                                  Foreground="{ThemeResource IosTertiaryLabelBrush}"
+                                  VerticalAlignment="Center" />
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="{Binding SelectionTitle}"
+                                       Style="{StaticResource IosBody}"
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding SelectionPath}"
+                                       Style="{StaticResource IosCaption}"
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding SelectionSize}"
+                                   Style="{StaticResource IosHeadline}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,4,0" />
+
+                        <Button Grid.Column="3"
+                                Content="Reveal"
+                                Style="{StaticResource IosSecondaryButton}"
+                                Click="OnRevealClick"
+                                IsEnabled="{Binding HasSelection}"
+                                VerticalAlignment="Center"
+                                MinWidth="90" />
+
+                        <Button Grid.Column="4"
+                                Content="Delete"
+                                Style="{StaticResource IosDestructiveButton}"
+                                Click="OnDeleteClick"
+                                IsEnabled="{Binding CanDelete}"
+                                VerticalAlignment="Center"
+                                MinWidth="90" />
+                    </Grid>
+
+                    <!-- Why Delete is off. Shown before the user reaches for it, not after. -->
+                    <StackPanel Visibility="{Binding HasBlockedReason, Converter={StaticResource BoolToVisibility}}">
+                        <Border Style="{StaticResource IosSeparator}" />
+                        <Grid Margin="16,11,16,11" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Grid.Column="0"
+                                      FontFamily="Segoe Fluent Icons"
+                                      Glyph="&#xE72E;"
+                                      FontSize="15"
+                                      Foreground="{ThemeResource IosRedBrush}"
+                                      VerticalAlignment="Top"
+                                      Margin="0,2,0,0" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding BlockedReason}"
+                                       Style="{StaticResource IosFootnote}" />
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Visibility="{Binding HasRiskWarning, Converter={StaticResource BoolToVisibility}}">
+                        <Border Style="{StaticResource IosSeparator}" />
+                        <Grid Margin="16,11,16,11" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Grid.Column="0"
+                                      FontFamily="Segoe Fluent Icons"
+                                      Glyph="&#xE7BA;"
+                                      FontSize="15"
+                                      Foreground="{ThemeResource IosOrangeBrush}"
+                                      VerticalAlignment="Top"
+                                      Margin="0,2,0,0" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding RiskWarning}"
+                                       Style="{StaticResource IosFootnote}" />
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </controls:GroupedCard>
+
+            <!-- ================= Largest folders ================= -->
+            <controls:GroupedCard Header="{Binding FoldersHeader}"
+                                  Visibility="{Binding LargestFolders.Count, Converter={StaticResource CountToVisibility}}">
+                <ItemsControl ItemsSource="{Binding LargestFolders}"
+                              ItemTemplate="{StaticResource SizeEntryTemplate}" />
+            </controls:GroupedCard>
+
+            <!-- ================= Largest files ================= -->
+            <controls:GroupedCard Header="{Binding FilesHeader}"
+                                  Footer="{Binding FilesFootnote}"
+                                  Visibility="{Binding LargestFiles.Count, Converter={StaticResource CountToVisibility}}">
+                <ItemsControl ItemsSource="{Binding LargestFiles}"
+                              ItemTemplate="{StaticResource SizeEntryTemplate}" />
+            </controls:GroupedCard>
+
+            <!-- ================= Empty state ================= -->
+            <Border Style="{StaticResource IosCardBorder}"
+                    Visibility="{Binding ShowEmptyState, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel Padding="20,28,20,28" Spacing="8" HorizontalAlignment="Center">
+                    <FontIcon FontFamily="Segoe Fluent Icons"
+                              Glyph="&#xE946;"
+                              FontSize="28"
+                              Foreground="{ThemeResource IosTertiaryLabelBrush}" />
+                    <TextBlock Text="Nothing large enough to report"
+                               Style="{StaticResource IosTitle3}"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="{Binding SkippedFootnote}"
+                       Style="{StaticResource IosFootnote}"
+                       Margin="32,0,32,0" />
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The control vocabulary.
+
+    Rules this file follows, and the reason for each:
+
+      * One structural line. A card is a 1px AppBorderBrush hairline at radius 8 - no shadow,
+        no fill contrast doing double duty. Nothing in the app is allowed a second border weight.
+      * Whitespace instead of boxes. Rows are 44px minimum with 20px of side inset; sections are
+        28px apart. Grouping is read from the gaps, not from nested frames.
+      * The accent appears on one control per screen. Everything else is text on a surface.
+      * Pointer feedback is a neutral ink wash (AppHoverBrush), never a colour change, so it
+        reads identically over an accent fill, a surface and transparency.
+
+    Brushes are referenced with {ThemeResource} (a runtime lookup, so it resolves across sibling
+    merged dictionaries and follows theme changes). Font stacks are written out literally instead
+    of via {StaticResource} for the same reason in reverse: StaticResource across sibling merged
+    dictionaries is order-sensitive and we would rather not depend on it.
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Ballast.App.Controls"
+    mc:Ignorable="d">
+
+    <!-- =====================================================================
+         Global geometry. Fluent defaults to 4px; the house radius is 8.
+         ===================================================================== -->
+    <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="OverlayCornerRadius">12</CornerRadius>
+    <CornerRadius x:Key="CheckBoxCornerRadius">4</CornerRadius>
+
+    <!-- The metrics every page is built on. -->
+    <x:Double x:Key="AppCardRadius">8</x:Double>
+    <x:Double x:Key="AppRowHeight">44</x:Double>
+    <Thickness x:Key="AppCardInset">20</Thickness>
+    <Thickness x:Key="AppRowPadding">20,12,20,12</Thickness>
+    <Thickness x:Key="AppPageInset">32,0,32,0</Thickness>
+    <Thickness x:Key="AppSectionMargin">32,0,32,28</Thickness>
+
+    <!-- =====================================================================
+         Surfaces
+         ===================================================================== -->
+
+    <!-- The card: surface fill, one hairline, radius 8, 28px of air beneath it. -->
+    <Style x:Key="AppCard" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource AppSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Margin" Value="32,0,32,28" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+
+    <!-- A nested panel inside a card. Fill only - a border inside a border is a box too many. -->
+    <Style x:Key="AppInsetPanel" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource AppSurfaceRaisedBrush}" />
+        <Setter Property="CornerRadius" Value="8" />
+    </Style>
+
+    <!-- Badge. Quiet by design: it labels state, it does not announce it. -->
+    <Style x:Key="AppPill" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource AppSurfaceRaisedBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="999" />
+        <Setter Property="Padding" Value="9,3,9,3" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+
+    <!-- 44px minimum row, 20/12 content padding. -->
+    <Style x:Key="AppRow" TargetType="Border">
+        <Setter Property="MinHeight" Value="44" />
+        <Setter Property="Padding" Value="20,12,20,12" />
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style x:Key="AppRowGrid" TargetType="Grid">
+        <Setter Property="MinHeight" Value="44" />
+        <Setter Property="Margin" Value="20,12,20,12" />
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <!-- Hairline between rows, inset so it starts under the text rather than at the card edge. -->
+    <Style x:Key="AppSeparator" TargetType="Border">
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Background" Value="{ThemeResource AppBorderBrush}" />
+        <Setter Property="Margin" Value="20,0,0,0" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+
+    <!-- Full-bleed variant, for the sticky footer bar. -->
+    <Style x:Key="AppSeparatorFull" TargetType="Border">
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Background" Value="{ThemeResource AppBorderBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+
+    <!-- =====================================================================
+         Small text roles that belong to layout rather than to the type ramp.
+         ===================================================================== -->
+
+    <!-- Section label above a card. Sentence case: shouting is decoration. -->
+    <Style x:Key="AppSectionHeader" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextSecondaryBrush}" />
+        <Setter Property="Margin" Value="34,0,34,10" />
+    </Style>
+
+    <!-- Explanatory note beneath a card. -->
+    <Style x:Key="AppSectionFooter" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="LineHeight" Value="19" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextSecondaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="34,10,34,28" />
+    </Style>
+
+    <!-- Trailing disclosure chevron on a navigable row. -->
+    <Style x:Key="AppChevron" TargetType="FontIcon">
+        <Setter Property="FontFamily" Value="Segoe Fluent Icons" />
+        <Setter Property="Glyph" Value="&#xE76C;" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextTertiaryBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="4,0,0,0" />
+    </Style>
+
+    <!--
+        Leading glyph on a row. Deliberately a bare mark in tertiary ink rather than the
+        coloured rounded tile this app used to draw: a row of saturated tiles turns a list
+        into a dashboard, and the eye stops reading the words.
+    -->
+    <Style x:Key="AppRowGlyph" TargetType="FontIcon">
+        <Setter Property="FontFamily" Value="Segoe Fluent Icons" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextTertiaryBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Width" Value="20" />
+    </Style>
+
+    <!-- =====================================================================
+         Buttons. One shared template; the styles differ only in fill and label.
+         Hover and press are an ink wash over whatever the fill happens to be.
+         ===================================================================== -->
+    <ControlTemplate x:Key="AppButtonTemplate" TargetType="Button">
+        <Grid x:Name="RootGrid" Background="Transparent">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="PointerOver">
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="Overlay"
+                                             Storyboard.TargetProperty="Opacity"
+                                             To="1" Duration="0:0:0.09" />
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="Overlay"
+                                             Storyboard.TargetProperty="Opacity"
+                                             To="1" Duration="0" />
+                            <DoubleAnimation Storyboard.TargetName="RootGrid"
+                                             Storyboard.TargetProperty="Opacity"
+                                             To="0.86" Duration="0" />
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="RootGrid"
+                                             Storyboard.TargetProperty="Opacity"
+                                             To="0.38" Duration="0" />
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+
+            <Border x:Name="Fill"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}" />
+
+            <Border x:Name="Overlay"
+                    Background="{ThemeResource AppHoverBrush}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    Opacity="0" />
+
+            <ContentPresenter x:Name="ContentPresenter"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Foreground="{TemplateBinding Foreground}"
+                              Padding="{TemplateBinding Padding}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Grid>
+    </ControlTemplate>
+
+    <!-- The one accent-filled control on a screen. -->
+    <Style x:Key="AppPrimaryButton" TargetType="Button">
+        <Setter Property="Background" Value="{ThemeResource AppAccentBrush}" />
+        <Setter Property="Foreground" Value="{ThemeResource AppOnAccentBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="20,10,20,10" />
+        <Setter Property="MinHeight" Value="38" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template" Value="{StaticResource AppButtonTemplate}" />
+    </Style>
+
+    <!-- Surface fill and a hairline: present, clearly clickable, not competing. -->
+    <Style x:Key="AppSecondaryButton" TargetType="Button">
+        <Setter Property="Background" Value="{ThemeResource AppSurfaceBrush}" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="18,9,18,9" />
+        <Setter Property="MinHeight" Value="38" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template" Value="{StaticResource AppButtonTemplate}" />
+    </Style>
+
+    <!-- No fill, no border. For tertiary actions that should not draw the eye at all. -->
+    <Style x:Key="AppGhostButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextSecondaryBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Padding" Value="12,7,12,7" />
+        <Setter Property="MinHeight" Value="34" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template" Value="{StaticResource AppButtonTemplate}" />
+    </Style>
+
+    <!-- Deletion. The only other filled button in the app, and never on the same row as the accent. -->
+    <Style x:Key="AppDangerButton" TargetType="Button">
+        <Setter Property="Background" Value="{ThemeResource AppDangerBrush}" />
+        <Setter Property="Foreground" Value="{ThemeResource AppOnDangerBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="20,10,20,10" />
+        <Setter Property="MinHeight" Value="38" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template" Value="{StaticResource AppButtonTemplate}" />
+    </Style>
+
+    <!--
+        A whole list row that behaves like a button (click to drill in).
+        Content stretches so the caller can lay out glyph / label / value / chevron.
+    -->
+    <Style x:Key="AppRowButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Padding" Value="20,12,20,12" />
+        <Setter Property="MinHeight" Value="44" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid x:Name="RootGrid" Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Highlight"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.09" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Highlight"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0" />
+                                        <DoubleAnimation Storyboard.TargetName="RootGrid"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0.9" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="RootGrid"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0.4" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <Border x:Name="Highlight"
+                                Background="{ThemeResource AppHoverBrush}"
+                                Opacity="0" />
+
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          Padding="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- =====================================================================
+         Segmented control. An ItemsControl of these reads as one control.
+         The selected segment is a raised surface plus a step up in text
+         contrast; there is no accent fill, because choosing a theme is not
+         the most important thing on the page.
+         ===================================================================== -->
+    <Style x:Key="AppSegmentTrack" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource AppSurfaceRaisedBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+
+    <Style x:Key="AppSegmentButton" TargetType="ToggleButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextSecondaryBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="14,6,14,6" />
+        <Setter Property="MinWidth" Value="76" />
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid x:Name="RootGrid" Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Hover"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.09" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Hover"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="RootGrid"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0.4" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Checked">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Selected"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.12" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Label"
+                                                                       Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AppTextBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="CheckedPointerOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Selected"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Label"
+                                                                       Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AppTextBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="CheckedPressed">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Selected"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0.85" Duration="0" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Label"
+                                                                       Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource AppTextBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="CheckedDisabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="RootGrid"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0.4" Duration="0" />
+                                        <DoubleAnimation Storyboard.TargetName="Selected"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Indeterminate" />
+                                <VisualState x:Name="IndeterminatePointerOver" />
+                                <VisualState x:Name="IndeterminatePressed" />
+                                <VisualState x:Name="IndeterminateDisabled" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <Border x:Name="Selected"
+                                Background="{ThemeResource AppSurfaceBrush}"
+                                CornerRadius="6"
+                                Opacity="0" />
+
+                        <Border x:Name="Hover"
+                                Background="{ThemeResource AppHoverBrush}"
+                                CornerRadius="6"
+                                Opacity="0" />
+
+                        <ContentPresenter x:Name="Label"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          Padding="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- =====================================================================
+         ToggleSwitch is deliberately left completely stock.
+
+         Two restyled treatments were tried and both were worse than the default:
+           1. A full custom ControlTemplate for an exact pill shape. It rendered
+              perfectly and silently swallowed every click, so no startup item
+              could be switched off at all.
+           2. Keeping the template but hiding the On/Off labels and retinting the
+              track. Input worked, but with the labels gone and colour as the only
+              signal, users could not tell on from off at a glance.
+
+         The stock Fluent switch states its position in words. For a control that
+         decides whether software launches with Windows, being unmistakable beats
+         being pretty. No style is defined here on purpose - the only concession to
+         the palette is the ToggleSwitchFillOn* brush keys in Colors.xaml, which
+         recolour the track without going near the template.
+         ===================================================================== -->
+
+    <!-- =====================================================================
+         Include/exclude checkbox. The Fluent template is kept (it is already a
+         rounded square) and retinted through the CheckBox* brush keys in
+         Colors.xaml; only the layout metrics are adjusted here.
+         ===================================================================== -->
+    <Style x:Key="AppCheckBox" TargetType="CheckBox">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+
+    <!-- =====================================================================
+         Progress. A hairline-thin rule; the number next to it does the talking.
+         ===================================================================== -->
+    <Style x:Key="AppProgressBar" TargetType="ProgressBar">
+        <Setter Property="Height" Value="3" />
+        <Setter Property="MinHeight" Value="3" />
+        <Setter Property="CornerRadius" Value="2" />
+        <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
+        <Setter Property="Background" Value="{ThemeResource AppBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+
+    <!-- =====================================================================
+         GroupedCard: optional section label, the card, optional footnote.
+         ===================================================================== -->
+    <Style TargetType="controls:GroupedCard">
+        <Setter Property="Margin" Value="32,0,32,28" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:GroupedCard">
+                    <StackPanel HorizontalAlignment="Stretch">
+                        <TextBlock x:Name="HeaderText"
+                                   FontFamily="Inter, Segoe UI Variable Text, Segoe UI"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{ThemeResource AppTextSecondaryBrush}"
+                                   Margin="2,0,2,10"
+                                   TextWrapping="Wrap"
+                                   Visibility="Collapsed" />
+
+                        <Border x:Name="CardBorder"
+                                Background="{ThemeResource AppSurfaceBrush}"
+                                BorderBrush="{ThemeResource AppBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                HorizontalAlignment="Stretch">
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              HorizontalAlignment="Stretch" />
+                        </Border>
+
+                        <TextBlock x:Name="FooterText"
+                                   FontFamily="Inter, Segoe UI Variable Text, Segoe UI"
+                                   FontSize="13"
+                                   LineHeight="19"
+                                   Foreground="{ThemeResource AppTextSecondaryBrush}"
+                                   Margin="2,10,2,0"
+                                   TextWrapping="Wrap"
+                                   Visibility="Collapsed" />
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- =====================================================================
+         Legacy iOS control styles, aliased onto the vocabulary above.
+
+         DiskSpacePage is still on these keys while another agent re-skins it;
+         pointing them at the new styles keeps that page consistent in the
+         meantime. Delete this block once nothing references it.
+         ===================================================================== -->
+    <Style x:Key="IosCardBorder" TargetType="Border" BasedOn="{StaticResource AppCard}" />
+    <Style x:Key="IosSeparator" TargetType="Border" BasedOn="{StaticResource AppSeparator}" />
+    <Style x:Key="IosSegmentTrack" TargetType="Border" BasedOn="{StaticResource AppSegmentTrack}" />
+    <Style x:Key="IosProgressBar" TargetType="ProgressBar" BasedOn="{StaticResource AppProgressBar}" />
+    <Style x:Key="IosPrimaryButton" TargetType="Button" BasedOn="{StaticResource AppPrimaryButton}" />
+    <Style x:Key="IosSecondaryButton" TargetType="Button" BasedOn="{StaticResource AppSecondaryButton}" />
+    <Style x:Key="IosDestructiveButton" TargetType="Button" BasedOn="{StaticResource AppDangerButton}" />
+    <Style x:Key="IosPlainButton" TargetType="Button" BasedOn="{StaticResource AppGhostButton}" />
+    <Style x:Key="IosRowButton" TargetType="Button" BasedOn="{StaticResource AppRowButton}" />
+    <Style x:Key="IosSegmentButton" TargetType="ToggleButton" BasedOn="{StaticResource AppSegmentButton}" />
+
+</ResourceDictionary>

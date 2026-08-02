@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Ballast.App.Views.AppsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Ballast.App.Controls"
+    xmlns:conv="using:Ballast.App.Converters"
+    Background="Transparent"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <conv:CountToVisibilityConverter x:Key="CountToVisibility" />
+
+        <!-- One sort segment. Together they read as a single control; see AppSegmentTrack. -->
+        <DataTemplate x:Key="SortSegmentTemplate">
+            <ToggleButton Style="{StaticResource AppSegmentButton}"
+                          Content="{Binding Label}"
+                          IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+        </DataTemplate>
+
+        <!--
+            One installed program: icon, name, publisher and version, install date and scope, size,
+            and the button that opens the program's own uninstaller.
+
+            The size cell is fixed-width and right-aligned so the column reads as a column. It shows
+            an em dash rather than "0 KB" when the registry recorded no size, which is most of the
+            time - see InstalledProgram.SizeDisplay.
+        -->
+        <DataTemplate x:Key="InstalledProgramTemplate">
+            <StackPanel>
+                <Border Style="{StaticResource AppSeparator}" />
+                <Grid Margin="20,12,20,12" ColumnSpacing="14" MinHeight="52">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--
+                        The program's own icon, with a neutral glyph underneath it. Both live in a
+                        fixed 24px cell so the name column starts at the same x on every row,
+                        whether or not an icon was found and whether or not it has arrived yet:
+                        icons are read after the list is on screen, so the fallback is what shows
+                        for the first instant of every scan.
+                    -->
+                    <Grid Grid.Column="0"
+                          Width="24"
+                          Height="24"
+                          VerticalAlignment="Center"
+                          AutomationProperties.AccessibilityView="Raw">
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                  Glyph="{Binding Glyph}"
+                                  FontSize="16"
+                                  Foreground="{ThemeResource AppTextTertiaryBrush}"
+                                  Visibility="{Binding ShowGlyph, Converter={StaticResource BoolToVisibility}}" />
+                        <Image Source="{Binding Icon}"
+                               Width="22"
+                               Height="22"
+                               Stretch="Uniform"
+                               Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibility}}" />
+                    </Grid>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock Text="{Binding Name}"
+                                   Style="{StaticResource TextBody}"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding SecondaryText}"
+                                   Style="{StaticResource TextSecondary}"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding CaptionText}"
+                                   Style="{StaticResource TextCaption}"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="2"
+                               Text="{Binding SizeText}"
+                               Style="{StaticResource TextSecondary}"
+                               VerticalAlignment="Center"
+                               TextAlignment="Right"
+                               MinWidth="72"
+                               TextWrapping="NoWrap" />
+
+                    <StackPanel Grid.Column="3"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                VerticalAlignment="Center">
+                        <Border Style="{StaticResource AppPill}"
+                                Visibility="{Binding ShowLaunchedNote, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="{Binding LaunchedNote}"
+                                       FontFamily="Inter, Segoe UI Variable Text, Segoe UI"
+                                       FontSize="12"
+                                       Foreground="{ThemeResource AppTextSecondaryBrush}" />
+                        </Border>
+
+                        <Border Style="{StaticResource AppPill}"
+                                Visibility="{Binding ShowAdminNote, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="{Binding AdminNote}"
+                                       FontFamily="Inter, Segoe UI Variable Text, Segoe UI"
+                                       FontSize="12"
+                                       Foreground="{ThemeResource AppTextSecondaryBrush}" />
+                        </Border>
+
+                        <!--
+                            Shown in place of the button when the installer registered no
+                            UninstallString. Saying so is the honest answer; the alternative every
+                            other cleaner picks is to delete the folder itself.
+                        -->
+                        <Border Style="{StaticResource AppPill}"
+                                Visibility="{Binding ShowNoUninstallerNote, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="{Binding NoUninstallerNote}"
+                                       FontFamily="Inter, Segoe UI Variable Text, Segoe UI"
+                                       FontSize="12"
+                                       Foreground="{ThemeResource AppTextTertiaryBrush}" />
+                        </Border>
+                    </StackPanel>
+
+                    <Button Grid.Column="4"
+                            Content="Uninstall"
+                            Style="{StaticResource AppSecondaryButton}"
+                            MinWidth="104"
+                            VerticalAlignment="Center"
+                            Click="OnUninstallClick"
+                            Visibility="{Binding CanUninstall, Converter={StaticResource BoolToVisibility}}" />
+                </Grid>
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+        <StackPanel Margin="0,0,0,40">
+
+            <TextBlock Text="Apps"
+                       Style="{StaticResource TextTitleLarge}"
+                       Margin="32,24,32,6" />
+            <TextBlock Text="Everything installed on this PC, and a way to run each program's own uninstaller."
+                       Style="{StaticResource TextSecondary}"
+                       MaxWidth="620"
+                       HorizontalAlignment="Left"
+                       Margin="32,0,32,32" />
+
+            <!-- Count + rescan, on the page rather than boxed. -->
+            <Grid Margin="32,0,32,0" ColumnSpacing="14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="Installed programs" Style="{StaticResource TextHeadline}" />
+                    <TextBlock Text="{Binding CountText}" Style="{StaticResource TextSecondary}" />
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Content="Rescan"
+                        Style="{StaticResource AppSecondaryButton}"
+                        Command="{Binding LoadCommand}"
+                        IsEnabled="{Binding IsIdle}"
+                        MinWidth="112" />
+            </Grid>
+
+            <ProgressBar Style="{StaticResource AppProgressBar}"
+                         IsIndeterminate="True"
+                         Margin="32,20,32,0"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+
+            <TextBlock Text="{Binding StatusText}"
+                       Style="{StaticResource TextSecondary}"
+                       Margin="32,16,32,0"
+                       TextWrapping="Wrap" />
+
+            <!-- ================= Search and sort ================= -->
+            <Grid Margin="32,24,32,0" ColumnSpacing="14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!--
+                    Stock TextBox, styled by nothing. The Fluent template retints itself through
+                    brush keys on hover and focus, so a Background set here would be dropped the
+                    moment the caret lands in it; the app-wide radius of 8 already applies.
+
+                    UpdateSourceTrigger is explicit because TextBox.Text defaults to LostFocus in
+                    WinUI, which would only filter the list once the user clicked away.
+                -->
+                <TextBox Grid.Column="0"
+                         MaxWidth="380"
+                         HorizontalAlignment="Left"
+                         PlaceholderText="Search by name or publisher"
+                         AutomationProperties.Name="Search installed programs"
+                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <Border Grid.Column="1" Style="{StaticResource AppSegmentTrack}">
+                    <ItemsControl ItemsSource="{Binding SortOptions}"
+                                  ItemTemplate="{StaticResource SortSegmentTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Border>
+            </Grid>
+
+            <Border Style="{StaticResource AppSeparatorFull}" Margin="32,32,32,32" />
+
+            <!--
+                Shown after an uninstaller has been opened. It says "rescan", not "removed":
+                the uninstaller runs as its own process and this page cannot know how it ended.
+            -->
+            <Border Style="{StaticResource AppCard}"
+                    Visibility="{Binding ShowPendingNote, Converter={StaticResource BoolToVisibility}}">
+                <Grid Margin="20,14,20,14" ColumnSpacing="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon Grid.Column="0"
+                              Style="{StaticResource AppRowGlyph}"
+                              Glyph="&#xE946;"
+                              VerticalAlignment="Top"
+                              Margin="0,2,0,0" />
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding PendingNote}"
+                               Style="{StaticResource TextSecondary}"
+                               TextWrapping="Wrap" />
+                </Grid>
+            </Border>
+
+            <!--
+                Leftover folders. Reported, never removed - the copy in the view model says so, and
+                there is no code path on this page that could delete one.
+            -->
+            <Border Style="{StaticResource AppCard}"
+                    Visibility="{Binding ShowLeftoverNote, Converter={StaticResource BoolToVisibility}}">
+                <Grid Margin="20,14,20,14" ColumnSpacing="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon Grid.Column="0"
+                              Style="{StaticResource AppRowGlyph}"
+                              Glyph="&#xE7BA;"
+                              VerticalAlignment="Top"
+                              Margin="0,2,0,0" />
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding LeftoverNote}"
+                               Style="{StaticResource TextSecondary}"
+                               TextWrapping="Wrap"
+                               IsTextSelectionEnabled="True" />
+                </Grid>
+            </Border>
+
+            <!-- ================= The list ================= -->
+            <controls:GroupedCard Header="Installed on this PC"
+                                  Footer="{Binding PageFootnote}"
+                                  Visibility="{Binding Programs.Count, Converter={StaticResource CountToVisibility}}">
+                <ItemsControl ItemsSource="{Binding Programs}"
+                              ItemTemplate="{StaticResource InstalledProgramTemplate}" />
+            </controls:GroupedCard>
+
+            <!-- ================= No search matches ================= -->
+            <Border Style="{StaticResource AppCard}"
+                    Visibility="{Binding ShowNoMatches, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel Padding="20,40,20,40" Spacing="10" HorizontalAlignment="Center">
+                    <FontIcon FontFamily="Segoe Fluent Icons"
+                              Glyph="&#xE721;"
+                              FontSize="22"
+                              Foreground="{ThemeResource AppTextTertiaryBrush}" />
+                    <TextBlock Text="Nothing matches that"
+                               Style="{StaticResource TextTitle}"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Text="Try part of the program's name, or its publisher."
+                               Style="{StaticResource TextSecondary}"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <!-- ================= Empty state ================= -->
+            <Border Style="{StaticResource AppCard}"
+                    Visibility="{Binding ShowEmptyState, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel Padding="20,40,20,40" Spacing="10" HorizontalAlignment="Center">
+                    <FontIcon FontFamily="Segoe Fluent Icons"
+                              Glyph="&#xE7BA;"
+                              FontSize="22"
+                              Foreground="{ThemeResource AppTextTertiaryBrush}" />
+                    <TextBlock Text="No programs are listed"
+                               Style="{StaticResource TextTitle}"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Text="The uninstall registry came back empty, which usually means it could not be read."
+                               Style="{StaticResource TextSecondary}"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               MaxWidth="420"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

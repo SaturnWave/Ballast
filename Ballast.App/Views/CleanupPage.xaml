@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Ballast.App.Views.CleanupPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Ballast.App.Controls"
+    xmlns:conv="using:Ballast.App.Converters"
+    Background="Transparent"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <conv:CountToVisibilityConverter x:Key="CountToVisibility" />
+
+        <!-- One deletable row inside an expanded category. -->
+        <DataTemplate x:Key="CleanupItemTemplate">
+            <StackPanel>
+                <Border Style="{StaticResource AppSeparator}" />
+                <Grid Margin="20,9,20,9" ColumnSpacing="14" MinHeight="44">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <FontIcon Grid.Column="0"
+                              Style="{StaticResource AppRowGlyph}"
+                              FontSize="14"
+                              Glyph="{Binding Glyph}" />
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding DisplayName}"
+                                   Style="{StaticResource TextBody}"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Path}"
+                                   Style="{StaticResource TextCaption}"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="2"
+                               Text="{Binding SizeDisplay}"
+                               Style="{StaticResource TextBody}"
+                               Foreground="{ThemeResource AppTextSecondaryBrush}"
+                               VerticalAlignment="Center" />
+
+                    <CheckBox Grid.Column="3"
+                              Style="{StaticResource AppCheckBox}"
+                              IsThreeState="False"
+                              IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                </Grid>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- One category. -->
+        <DataTemplate x:Key="JunkCategoryTemplate">
+            <controls:GroupedCard Footer="{Binding FooterText}"
+                                  Visibility="{Binding HasItems, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel>
+
+                    <!-- Summary row -->
+                    <Grid Margin="20,12,20,12" ColumnSpacing="14" MinHeight="44">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <FontIcon Grid.Column="0"
+                                  Style="{StaticResource AppRowGlyph}"
+                                  Glyph="{Binding Glyph}" />
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Title}" Style="{StaticResource TextBody}" />
+                            <TextBlock Text="{Binding CountDisplay}" Style="{StaticResource TextCaption}" />
+                        </StackPanel>
+
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding TotalDisplay}"
+                                   Style="{StaticResource TextHeadline}"
+                                   VerticalAlignment="Center" />
+
+                        <CheckBox Grid.Column="3"
+                                  Style="{StaticResource AppCheckBox}"
+                                  IsThreeState="False"
+                                  IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+
+                        <Button Grid.Column="4"
+                                Style="{StaticResource AppGhostButton}"
+                                Command="{Binding ToggleExpandedCommand}"
+                                MinWidth="34"
+                                Padding="8,6,8,6">
+                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                      Glyph="{Binding ExpandGlyph}"
+                                      FontSize="12"
+                                      Foreground="{ThemeResource AppTextTertiaryBrush}" />
+                        </Button>
+                    </Grid>
+
+                    <!-- Expanded item list -->
+                    <StackPanel Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVisibility}}">
+                        <ItemsControl ItemsSource="{Binding PreviewItems}"
+                                      ItemTemplate="{StaticResource CleanupItemTemplate}" />
+                        <Border Style="{StaticResource AppSeparator}"
+                                Visibility="{Binding HasMoreItems, Converter={StaticResource BoolToVisibility}}" />
+                        <TextBlock Text="{Binding MoreItemsText}"
+                                   Style="{StaticResource TextCaption}"
+                                   Margin="20,10,20,12"
+                                   Visibility="{Binding HasMoreItems, Converter={StaticResource BoolToVisibility}}" />
+                    </StackPanel>
+
+                </StackPanel>
+            </controls:GroupedCard>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+            <StackPanel Margin="0,0,0,32">
+
+                <TextBlock Text="Cleanup"
+                           Style="{StaticResource TextTitleLarge}"
+                           Margin="32,24,32,6" />
+                <TextBlock Text="Scanning only reads. Review the groups below, then choose what to remove."
+                           Style="{StaticResource TextSecondary}"
+                           MaxWidth="560"
+                           HorizontalAlignment="Left"
+                           Margin="32,0,32,32" />
+
+                <!--
+                    The scan control sits on the page rather than in a card of its own. It is
+                    one action and one line of status; a frame around it would only add a box
+                    for the eye to cross before it reaches the results.
+                -->
+                <Grid Margin="32,0,32,0" ColumnSpacing="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="Junk scan" Style="{StaticResource TextHeadline}" />
+                        <TextBlock Text="{Binding TotalDisplay}" Style="{StaticResource TextSecondary}" />
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Content="Scan"
+                            Style="{StaticResource AppPrimaryButton}"
+                            Command="{Binding ScanCommand}"
+                            IsEnabled="{Binding IsIdle}"
+                            MinWidth="112" />
+
+                    <Button Grid.Column="2"
+                            Content="Stop"
+                            Style="{StaticResource AppSecondaryButton}"
+                            Command="{Binding CancelCommand}"
+                            Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}"
+                            MinWidth="88" />
+                </Grid>
+
+                <StackPanel Margin="32,20,32,0"
+                            Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}">
+                    <ProgressBar Style="{StaticResource AppProgressBar}"
+                                 Maximum="100"
+                                 Value="{Binding ProgressValue}"
+                                 IsIndeterminate="{Binding IsIndeterminate}" />
+                    <TextBlock Text="{Binding CurrentPath}"
+                               Style="{StaticResource TextCaption}"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"
+                               Margin="0,10,0,0" />
+                </StackPanel>
+
+                <TextBlock Text="{Binding StatusText}"
+                           Style="{StaticResource TextSecondary}"
+                           Margin="32,16,32,0" />
+
+                <Border Style="{StaticResource AppSeparatorFull}" Margin="32,32,32,32" />
+
+                <!-- ================= Empty state ================= -->
+                <Border Style="{StaticResource AppCard}"
+                        Visibility="{Binding ShowEmptyState, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel Padding="20,40,20,40" Spacing="10" HorizontalAlignment="Center">
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE73E;"
+                                  FontSize="22"
+                                  Foreground="{ThemeResource AppTextTertiaryBrush}" />
+                        <TextBlock Text="Nothing to clean"
+                                   Style="{StaticResource TextTitle}"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="Your caches and temporary folders are already empty."
+                                   Style="{StaticResource TextSecondary}"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ================= One card per category ================= -->
+                <ItemsControl ItemsSource="{Binding Categories}"
+                              ItemTemplate="{StaticResource JunkCategoryTemplate}" />
+
+                <!-- ================= Skipped paths ================= -->
+                <controls:GroupedCard Header="Skipped"
+                                      Footer="These are in use or protected by Windows. They were not counted and will not be touched."
+                                      Visibility="{Binding SkippedPaths.Count, Converter={StaticResource CountToVisibility}}">
+                    <ItemsControl ItemsSource="{Binding SkippedPaths}" Margin="20,14,20,14">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"
+                                           Style="{StaticResource TextCaption}"
+                                           TextWrapping="NoWrap"
+                                           TextTrimming="CharacterEllipsis"
+                                           Margin="0,2,0,2" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </controls:GroupedCard>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ================= Sticky footer ================= -->
+        <Border Grid.Row="1"
+                Background="{ThemeResource AppSurfaceBrush}"
+                BorderBrush="{ThemeResource AppBorderBrush}"
+                BorderThickness="0,1,0,0">
+            <Grid Padding="32,16,32,16" ColumnSpacing="14" MinHeight="76">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding ReclaimLabel}" Style="{StaticResource TextTitle}" />
+                    <TextBlock Text="{Binding SelectionSummary}" Style="{StaticResource TextSecondary}" />
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Content="Stop"
+                        Style="{StaticResource AppSecondaryButton}"
+                        Command="{Binding CancelCommand}"
+                        Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}"
+                        MinWidth="88" />
+
+                <Button x:Name="CleanButton"
+                        Grid.Column="2"
+                        Content="Clean"
+                        Style="{StaticResource AppDangerButton}"
+                        Click="OnCleanClick"
+                        IsEnabled="{Binding CanClean}"
+                        MinWidth="132" />
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

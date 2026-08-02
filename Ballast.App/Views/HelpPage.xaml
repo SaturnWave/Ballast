@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Ballast.App.Views.HelpPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:conv="using:Ballast.App.Converters"
+    Background="Transparent"
+    mc:Ignorable="d">
+
+    <!--
+        The page a cautious person reads before letting this app delete anything. It is prose on
+        purpose: the questions it answers ("what happens if I press Scan?", "can I get it back?",
+        "why does it want administrator?") are answered in sentences, not in a feature list.
+
+        Every paragraph here is a claim about the code, and each one was written from the code
+        rather than from intent. The five risk descriptions are bound rather than typed, so the
+        legend cannot drift from DeletionRiskAssessor.
+
+        Body copy is capped at 680px. A paragraph measured across a 2200px window is unreadable
+        however good the type is.
+    -->
+
+    <Page.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <x:Double x:Key="Measure">680</x:Double>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+        <StackPanel Margin="0,0,0,40">
+
+            <TextBlock Text="Help"
+                       Style="{StaticResource TextTitleLarge}"
+                       Margin="32,24,32,6" />
+            <TextBlock Text="Ballast deletes files, so most of this page is about what it refuses to do &#x2014; and how you can check that for yourself."
+                       Style="{StaticResource TextSecondary}"
+                       MaxWidth="{StaticResource Measure}"
+                       HorizontalAlignment="Left"
+                       Margin="32,0,32,36" />
+
+            <!-- ================= 1. What it is ================= -->
+            <TextBlock Text="What Ballast is" Style="{StaticResource AppSectionHeader}" />
+            <Border Style="{StaticResource AppCard}">
+                <StackPanel Margin="20,16,20,18"
+                            MaxWidth="{StaticResource Measure}"
+                            HorizontalAlignment="Left"
+                            Spacing="16">
+
+                    <TextBlock Style="{StaticResource TextBody}" TextWrapping="Wrap"
+                               Text="Ballast is the dead weight a ship drops to move faster. This app does that to a full disk: it finds the caches, temporary files and forgotten downloads that Windows and your programs leave behind, shows you what each one is costing you in space, and removes only what you agree to remove." />
+
+                    <Grid ColumnSpacing="16" RowSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="92" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Cleanup"
+                                   Style="{StaticResource TextBody}" FontWeight="SemiBold" />
+                        <TextBlock Grid.Row="0" Grid.Column="1"
+                                   Style="{StaticResource TextSecondary}"
+                                   Text="Finds junk by itself and hands you the list, with every item priced and every item optional." />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Disk Space"
+                                   Style="{StaticResource TextBody}" FontWeight="SemiBold" />
+                        <TextBlock Grid.Row="1" Grid.Column="1"
+                                   Style="{StaticResource TextSecondary}"
+                                   Text="Maps a drive so you can see what is actually large, and delete something you recognise." />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Startup"
+                                   Style="{StaticResource TextBody}" FontWeight="SemiBold" />
+                        <TextBlock Grid.Row="2" Grid.Column="1"
+                                   Style="{StaticResource TextSecondary}"
+                                   Text="Lists what runs when you sign in, and switches entries off in a way you can undo." />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- ================= 2. Scanning never deletes ================= -->
+            <TextBlock Text="Scanning never deletes anything" Style="{StaticResource AppSectionHeader}" />
+            <Border Style="{StaticResource AppCard}">
+                <StackPanel Margin="20,16,20,18"
+                            MaxWidth="{StaticResource Measure}"
+                            HorizontalAlignment="Left"
+                            Spacing="14">
+
+                    <TextBlock Style="{StaticResource TextBody}" TextWrapping="Wrap"
+                               Text="Every scan is read-only. Ballast measures, lists and colours what it finds, and then stops and waits. Nothing leaves your disk until you press a delete button and accept a dialog that names the items, states how much space they take and says where they are going. Cancel is that dialog's default button, so pressing Enter cannot delete anything." />
+
+                    <TextBlock Style="{StaticResource TextSecondary}"
+                               Text="A scan result is not permission, either. Every path is checked against the safety rules again in the moment before it is handed to Windows, because a list built a few minutes ago may describe a disk that has since changed." />
+                </StackPanel>
+            </Border>
+
+            <!-- ================= 3. The two deletion paths ================= -->
+            <TextBlock Text="Two ways to delete, under opposite rules" Style="{StaticResource AppSectionHeader}" />
+            <Border Style="{StaticResource AppCard}" Margin="32,0,32,0">
+                <StackPanel Margin="20,16,20,18"
+                            MaxWidth="{StaticResource Measure}"
+                            HorizontalAlignment="Left"
+                            Spacing="16">
+
+                    <Grid ColumnSpacing="18">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="104" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- header -->
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="Cleanup page"
+                                   Style="{StaticResource TextBody}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Disk Space page"
+                                   Style="{StaticResource TextBody}" FontWeight="SemiBold" TextWrapping="Wrap" />
+
+                        <Border Grid.Row="1" Grid.ColumnSpan="3"
+                                Style="{StaticResource AppSeparatorFull}"
+                                Margin="0,12,0,12" />
+
+                        <!-- who decides -->
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Who chooses"
+                                   Style="{StaticResource TextSecondary}" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="Ballast, on its own."
+                                   Style="{StaticResource TextBody}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text="You, one item at a time, then a dialog naming it."
+                                   Style="{StaticResource TextBody}" TextWrapping="Wrap" />
+
+                        <Border Grid.Row="3" Grid.ColumnSpan="3"
+                                Style="{StaticResource AppSeparatorFull}"
+                                Margin="0,12,0,12" />
+
+                        <!-- the guard -->
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="What it may touch"
+                                   Style="{StaticResource TextSecondary}" />
+                        <TextBlock Grid.Row="4" Grid.Column="1"
+                                   Style="{StaticResource TextBody}" TextWrapping="Wrap"
+                                   Text="An allowlist: only inside known junk folders. Everything else on the disk is invisible to it." />
+                        <TextBlock Grid.Row="4" Grid.Column="2"
+                                   Style="{StaticResource TextBody}" TextWrapping="Wrap"
+                                   Text="A denylist: anything except the locations Windows itself needs to start and run." />
+
+                        <Border Grid.Row="5" Grid.ColumnSpan="3"
+                                Style="{StaticResource AppSeparatorFull}"
+                                Margin="0,12,0,12" />
+
+                        <!-- where it goes -->
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Where it goes"
+                                   Style="{StaticResource TextSecondary}" />
+                        <TextBlock Grid.Row="6" Grid.Column="1"
+                                   Style="{StaticResource TextBody}" TextWrapping="Wrap"
+                                   Text="Removed outright. A cache is rebuilt the next time something needs it." />
+                        <TextBlock Grid.Row="6" Grid.Column="2"
+                                   Style="{StaticResource TextBody}" TextWrapping="Wrap"
+                                   Text="The Recycle Bin, so a mistake costs a restore rather than a recovery service." />
+                    </Grid>
+
+                    <Border Style="{StaticResource AppSeparatorFull}" />
+
+                    <TextBlock Style="{StaticResource TextSecondary}"
+                               Text="{Binding AllowlistText}" />
+                </StackPanel>
+            </Border>
+            <TextBlock Style="{StaticResource AppSectionFooter}"
+                       Margin="34,10,34,28"
+                       MaxWidth="{StaticResource Measure}"
+                       HorizontalAlignment="Left"
+                       Text="The two rules are inverted because the decision is. When Ballast is choosing on its own it may only reach into a short list of places it is certain about &#x2014; with a list of forbidden places instead, one missing entry would mean lost work. When you have picked a file yourself, the only job left for the guard is to stop you breaking Windows, not to second-guess your own data. And because your own data is irreplaceable, those deletions go to the Recycle Bin. If the bin cannot take an item &#x2014; too large, or a drive without one &#x2014; Ballast reports it and stops, rather than quietly deleting it for good." />
+
+            <!-- ================= 4. The risk ramp ================= -->
+            <TextBlock Text="The five risk levels" Style="{StaticResource AppSectionHeader}" />
+            <Border Style="{StaticResource AppCard}" Margin="32,0,32,0">
+                <StackPanel Margin="20,16,20,18"
+                            MaxWidth="{StaticResource Measure}"
+                            HorizontalAlignment="Left"
+                            Spacing="16">
+
+                    <TextBlock Style="{StaticResource TextSecondary}"
+                               Text="Everything on the Disk Space page is rated before you can delete it, and the rating gives it its colour in the map and in the list. These are the same five colours everywhere in the app." />
+
+                    <!-- Level 1 -->
+                    <Grid ColumnSpacing="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="12" Height="12" CornerRadius="3"
+                                VerticalAlignment="Top" Margin="0,4,0,0"
+                                Background="{ThemeResource Risk1Brush}" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding SystemLevel.Label}"
+                                       Style="{StaticResource TextBody}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding SystemLevel.Description}"
+                                       Style="{StaticResource TextSecondary}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Level 2 -->
+                    <Grid ColumnSpacing="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="12" Height="12" CornerRadius="3"
+                                VerticalAlignment="Top" Margin="0,4,0,0"
+                                Background="{ThemeResource Risk2Brush}" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding RiskyLevel.Label}"
+                                       Style="{StaticResource TextBody}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding RiskyLevel.Description}"
+                                       Style="{StaticResource TextSecondary}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Level 3 -->
+                    <Grid ColumnSpacing="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="12" Height="12" CornerRadius="3"
+                                VerticalAlignment="Top" Margin="0,4,0,0"
+                                Background="{ThemeResource Risk3Brush}" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding CautionLevel.Label}"
+                                       Style="{StaticResource TextBody}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding CautionLevel.Description}"
+                                       Style="{StaticResource TextSecondary}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Level 4 -->
+                    <Grid ColumnSpacing="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="12" Height="12" CornerRadius="3"
+                                VerticalAlignment="Top" Margin="0,4,0,0"
+                                Background="{ThemeResource Risk4Brush}" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding ProbablySafeLevel.Label}"
+                                       Style="{StaticResource TextBody}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding ProbablySafeLevel.Description}"
+                                       Style="{StaticResource TextSecondary}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Level 5 -->
+                    <Grid ColumnSpacing="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="12" Height="12" CornerRadius="3"
+                                VerticalAlignment="Top" Margin="0,4,0,0"
+                                Background="{ThemeResource Risk5Brush}" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding SafeLevel.Label}"
+                                       Style="{StaticResource TextBody}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding SafeLevel.Description}"
+                                       Style="{StaticResource TextSecondary}" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <TextBlock Style="{StaticResource AppSectionFooter}"
+                       Margin="34,10,34,28"
+                       MaxWidth="{StaticResource Measure}"
+                       HorizontalAlignment="Left"
+                       Text="Red is the one level Ballast enforces rather than advises: a system item is refused outright wherever you ask from, and automatic cleaning never sees it at all. The four above it are advice, and they are meant to be read before you confirm. Anything Ballast cannot identify is rated Caution, never Safe &#x2014; a disk map's whole purpose is to show you folders you have never seen before, and &#x201C;we do not know what this is&#x201D; must never look green." />
+
+            <!-- ================= 5. What it never touches ================= -->
+            <TextBlock Text="What Ballast never touches" Style="{StaticResource AppSectionHeader}" />
+            <Border Style="{StaticResource AppCard}">
+                <StackPanel Margin="20,16,20,18"
+                            MaxWidth="{StaticResource Measure}"
+                            HorizontalAlignment="Left"
+                            Spacing="16">
+
+                    <StackPanel>
+                        <TextBlock Text="Cloud files that are not really here"
+                                   Style="{StaticResource TextBody}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <TextBlock Style="{StaticResource TextSecondary}"
+                                   Text="OneDrive, Google Drive, Dropbox and iCloud can list a file without keeping it on this disk. Those placeholders are excluded from every scan for two reasons: the space they claim is not real local space, so counting it would inflate every total Ballast shows you, and simply opening one makes the sync client download it &#x2014; which could pull down hundreds of gigabytes over a connection you pay for." />
+                    </StackPanel>
+
+                    <Border Style="{StaticResource AppSeparatorFull}" />
+
+                    <StackPanel>
+                        <TextBlock Text="Your sign-ins, history and bookmarks"
+                                   Style="{StaticResource TextBody}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <TextBlock Style="{StaticResource TextSecondary}"
+                                   Text="Browser cleaning clears folders named as caches, and nothing else. Saved passwords, cookies, history, bookmarks and preferences are refused by filename wherever they live, no matter which part of the app asks for them. Being signed out of every website you use would be a worse outcome than a full disk." />
+                    </StackPanel>
+
+                    <Border Style="{StaticResource AppSeparatorFull}" />
+
+                    <StackPanel>
+                        <TextBlock Text="Junctions and symbolic links"
+                                   Style="{StaticResource TextBody}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <TextBlock Style="{StaticResource TextSecondary}"
+                                   Text="A folder that is really a pointer at another folder is never followed and never deleted. Following one lets a scan wander out of the folder it started in, or walk in a circle." />
+                    </StackPanel>
+
+                    <Border Style="{StaticResource AppSeparatorFull}" />
+
+                    <StackPanel>
+                        <TextBlock Text="Anything touched in the last day"
+                                   Style="{StaticResource TextBody}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <TextBlock Style="{StaticResource TextSecondary}"
+                                   Text="Files changed in the last 24 hours are left where they are, because an installer or an update that is still running may need them. The Windows Update cache is given a week." />
+                    </StackPanel>
+
+                    <Border Style="{StaticResource AppSeparatorFull}" />
+
+                    <StackPanel>
+                        <TextBlock Text="The junk folders themselves"
+                                   Style="{StaticResource TextBody}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <TextBlock Style="{StaticResource TextSecondary}"
+                                   Text="Cleaning empties a known junk folder; it never removes the folder. Windows and your programs expect those to exist. Locked files are skipped and reported rather than forced, and the space Ballast claims to have freed is measured per file as it goes, not estimated." />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ================= 6. Administrator ================= -->
+            <TextBlock Text="Why it asks for administrator" Style="{StaticResource AppSectionHeader}" />
+            <Border Style="{StaticResource AppCard}" Margin="32,0,32,0">
+                <StackPanel Margin="20,16,20,18"
+                            MaxWidth="{StaticResource Measure}"
+                            HorizontalAlignment="Left"
+                            Spacing="14">
+
+                    <TextBlock Style="{StaticResource TextBody}" TextWrapping="Wrap"
+                               Text="Windows shows a User Account Control prompt when Ballast starts, and Ballast does not start without it. That request is declared in the app itself, which means it happens once, in Windows' own dialog, in the open. Ballast never elevates silently and never asks again in the middle of your work." />
+
+                    <TextBlock Style="{StaticResource TextBody}" TextWrapping="Wrap"
+                               Text="Administrator rights are what make these readable at all: C:\Windows\Temp, the Windows Update download cache, startup entries that belong to the whole machine rather than to you, the all-users Startup folder, and the scheduled tasks that run when you sign in. Without them, those are not merely unclickable &#x2014; they never appear in a scan." />
+
+                    <TextBlock Style="{StaticResource TextSecondary}"
+                               Text="The cost is worth stating plainly. Everything Ballast deletes then runs with full privileges, which is exactly why the junk allowlist and the protected-location guard exist, and why neither of them is allowed to be loosened for convenience." />
+                </StackPanel>
+            </Border>
+            <TextBlock Style="{StaticResource AppSectionFooter}"
+                       Margin="34,10,34,28"
+                       MaxWidth="{StaticResource Measure}"
+                       HorizontalAlignment="Left"
+                       Text="{Binding ElevationText}" />
+
+            <!-- ================= 7. Startup is reversible ================= -->
+            <TextBlock Text="Turning off a startup item is reversible" Style="{StaticResource AppSectionHeader}" />
+            <Border Style="{StaticResource AppCard}" Margin="32,0,32,0">
+                <StackPanel Margin="20,16,20,18"
+                            MaxWidth="{StaticResource Measure}"
+                            HorizontalAlignment="Left"
+                            Spacing="14">
+
+                    <TextBlock Style="{StaticResource TextBody}" TextWrapping="Wrap"
+                               Text="Nothing on the Startup page is deleted. Switching an entry off moves it; switching it back on moves it home again." />
+
+                    <TextBlock Style="{StaticResource TextSecondary}"
+                               Text="A registry entry is moved into a backup key beside the original, named Run-disabled-Ballast. The copy is written and checked before the original goes, so the worst thing a failure can do is leave the entry listed in both places. A shortcut in a Startup folder is moved into a Disabled-Ballast subfolder of that same folder &#x2014; Windows does not launch anything from a subfolder, and the file itself is untouched. A scheduled task keeps its whole definition and simply has its enabled flag turned off, the same switch Windows' own Task Scheduler uses." />
+                </StackPanel>
+            </Border>
+            <TextBlock Style="{StaticResource AppSectionFooter}"
+                       Margin="34,10,34,28"
+                       MaxWidth="{StaticResource Measure}"
+                       HorizontalAlignment="Left"
+                       Text="So if you stop using Ballast tomorrow, nothing it disabled is lost: the entries are sitting in those two places under their original names, and Windows itself can put them back." />
+
+            <!-- ================= 8. The audit log ================= -->
+            <TextBlock Text="Where the evidence is" Style="{StaticResource AppSectionHeader}" />
+            <Border Style="{StaticResource AppCard}" Margin="32,0,32,0">
+                <StackPanel>
+                    <StackPanel Margin="20,16,20,18"
+                                MaxWidth="{StaticResource Measure}"
+                                HorizontalAlignment="Left"
+                                Spacing="14">
+
+                        <TextBlock Style="{StaticResource TextBody}" TextWrapping="Wrap"
+                                   Text="Every deletion is written to a plain text file as it happens: one line per item with its size and its full path, and one line for anything that was refused or failed, with the reason it was. If you ever want to know what this app did to your disk, that file is the answer, and it does not depend on Ballast being open." />
+
+                        <TextBlock Style="{StaticResource TextSecondary}"
+                                   Text="Nothing is uploaded anywhere. The log is a file on your own disk that you can read, keep or delete like any other." />
+                    </StackPanel>
+
+                    <Border Style="{StaticResource AppSeparatorFull}" />
+
+                    <Button Style="{StaticResource AppRowButton}"
+                            Command="{Binding OpenLogFolderCommand}">
+                        <Grid ColumnSpacing="14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Grid.Column="0"
+                                      Style="{StaticResource AppRowGlyph}"
+                                      Glyph="&#xE838;" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Open log folder" Style="{StaticResource TextBody}" />
+                                <TextBlock Text="{Binding LogFolder}"
+                                           Style="{StaticResource TextCaption}"
+                                           TextWrapping="NoWrap"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                            <FontIcon Grid.Column="2" Style="{StaticResource AppChevron}" />
+                        </Grid>
+                    </Button>
+                </StackPanel>
+            </Border>
+            <TextBlock Style="{StaticResource AppSectionFooter}"
+                       Margin="34,10,34,28"
+                       MaxWidth="{StaticResource Measure}"
+                       HorizontalAlignment="Left"
+                       Text="{Binding StatusText}"
+                       Visibility="{Binding HasStatus, Converter={StaticResource BoolToVisibility}}" />
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

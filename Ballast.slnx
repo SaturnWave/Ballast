@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Ballast.App/Ballast.App.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="Ballast.Core/Ballast.Core.csproj" />
+  <Project Path="Ballast.Tests/Ballast.Tests.csproj" />
+</Solution>

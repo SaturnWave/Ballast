@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Ballast.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:Ballast.App"
+    mc:Ignorable="d">
+
+    <!--
+        No system backdrop. Mica tints the whole window with the desktop wallpaper, which is
+        exactly the kind of ambient noise this design is trying to remove; warm paper and
+        graphite only read as themselves over a flat, opaque surface.
+    -->
+    <Grid Background="{ThemeResource AppBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Drag region. Registered with SetTitleBar in the code-behind; the caption buttons
+             are drawn by the system on top of the right-hand end. -->
+        <Grid x:Name="AppTitleBar" Grid.Row="0" Background="Transparent">
+            <TextBlock Text="Ballast"
+                       FontFamily="Inter, Segoe UI Variable Text, Segoe UI"
+                       FontSize="13"
+                       FontWeight="SemiBold"
+                       Foreground="{ThemeResource AppTextSecondaryBrush}"
+                       VerticalAlignment="Center"
+                       Margin="20,0,0,0" />
+        </Grid>
+
+        <NavigationView x:Name="NavView"
+                        Grid.Row="1"
+                        PaneDisplayMode="Left"
+                        OpenPaneLength="240"
+                        IsBackButtonVisible="Collapsed"
+                        IsBackEnabled="False"
+                        IsPaneToggleButtonVisible="False"
+                        IsSettingsVisible="False"
+                        Loaded="OnNavViewLoaded"
+                        SelectionChanged="OnNavViewSelectionChanged">
+
+            <NavigationView.Resources>
+                <ResourceDictionary>
+                    <ResourceDictionary.ThemeDictionaries>
+                        <!--
+                            The sidebar recedes. A selected item is a step up in surface and a
+                            step up in text contrast - no tinted pill - and the only accent in
+                            the pane is the 3px marker WinUI already draws on the left edge,
+                            which the old styling had hidden by painting it transparent.
+                        -->
+                        <ResourceDictionary x:Key="Light">
+                            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#F4F3EF" />
+                            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPointerOver" Color="#EFEDE6" />
+                            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPressed" Color="#E9E7DF" />
+                            <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="#1C1B19" Opacity="0.045" />
+                            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#1C1B19" Opacity="0.085" />
+                            <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#6B6862" />
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="#1C1B19" />
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundPressed" Color="#1C1B19" />
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="#1C1B19" />
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="#1C1B19" />
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPressed" Color="#1C1B19" />
+                            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#4F46B8" />
+                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="Dark">
+                            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#27262C" />
+                            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPointerOver" Color="#2E2D34" />
+                            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPressed" Color="#34333B" />
+                            <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="#FFFFFF" Opacity="0.06" />
+                            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#FFFFFF" Opacity="0.10" />
+                            <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#A5A29B" />
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="#F2F1EC" />
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundPressed" Color="#F2F1EC" />
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="#F2F1EC" />
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="#F2F1EC" />
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPressed" Color="#F2F1EC" />
+                            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#7C74DC" />
+                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="HighContrast" />
+                    </ResourceDictionary.ThemeDictionaries>
+
+                    <!-- The pane and the content region are the same surface; the hairline on
+                         the content Border below is the only thing dividing them. -->
+                    <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="Transparent" />
+                    <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="Transparent" />
+                    <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
+                    <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="Transparent" />
+                    <Thickness x:Key="NavigationViewContentGridBorderThickness">0</Thickness>
+                    <Thickness x:Key="NavigationViewMinimalContentGridBorderThickness">0</Thickness>
+                    <CornerRadius x:Key="NavigationViewContentGridCornerRadius">0</CornerRadius>
+
+                    <!-- Taller rows, softer corner, more air around the label. -->
+                    <CornerRadius x:Key="NavigationViewItemPresenterCornerRadius">6</CornerRadius>
+                    <Thickness x:Key="NavigationViewItemInnerMargin">6,4,6,4</Thickness>
+                    <x:Double x:Key="NavigationViewItemOnLeftMinHeight">42</x:Double>
+                </ResourceDictionary>
+            </NavigationView.Resources>
+
+            <!--
+                Icons carry no Foreground of their own: they inherit the item's, so an
+                unselected row is uniformly secondary ink and a selected row is uniformly
+                primary. Nothing in the pane is tinted.
+            -->
+            <NavigationView.MenuItems>
+                <NavigationViewItem x:Name="DashboardItem" Tag="dashboard"
+                                    AutomationProperties.Name="Dashboard">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE80F;" FontSize="16" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.Content>
+                        <TextBlock Text="Dashboard" FontSize="14"
+                                   FontFamily="Inter, Segoe UI Variable Text, Segoe UI" />
+                    </NavigationViewItem.Content>
+                </NavigationViewItem>
+
+                <NavigationViewItem x:Name="CleanupItem" Tag="cleanup"
+                                    AutomationProperties.Name="Cleanup">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEA99;" FontSize="16" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.Content>
+                        <TextBlock Text="Cleanup" FontSize="14"
+                                   FontFamily="Inter, Segoe UI Variable Text, Segoe UI" />
+                    </NavigationViewItem.Content>
+                </NavigationViewItem>
+
+                <NavigationViewItem x:Name="DiskSpaceItem" Tag="diskspace"
+                                    AutomationProperties.Name="Disk Space">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEDA2;" FontSize="16" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.Content>
+                        <TextBlock Text="Disk Space" FontSize="14"
+                                   FontFamily="Inter, Segoe UI Variable Text, Segoe UI" />
+                    </NavigationViewItem.Content>
+                </NavigationViewItem>
+
+                <NavigationViewItem x:Name="AppsItem" Tag="apps"
+                                    AutomationProperties.Name="Apps">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71D;" FontSize="16" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.Content>
+                        <TextBlock Text="Apps" FontSize="14"
+                                   FontFamily="Inter, Segoe UI Variable Text, Segoe UI" />
+                    </NavigationViewItem.Content>
+                </NavigationViewItem>
+
+                <NavigationViewItem x:Name="StartupItem" Tag="startup"
+                                    AutomationProperties.Name="Startup">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE945;" FontSize="16" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.Content>
+                        <TextBlock Text="Startup" FontSize="14"
+                                   FontFamily="Inter, Segoe UI Variable Text, Segoe UI" />
+                    </NavigationViewItem.Content>
+                </NavigationViewItem>
+
+                <NavigationViewItem x:Name="SecurityItem" Tag="security"
+                                    AutomationProperties.Name="Security">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE72E;" FontSize="16" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.Content>
+                        <TextBlock Text="Security" FontSize="14"
+                                   FontFamily="Inter, Segoe UI Variable Text, Segoe UI" />
+                    </NavigationViewItem.Content>
+                </NavigationViewItem>
+
+                <!-- Settings and Help sit apart from the working pages. -->
+                <NavigationViewItemSeparator Margin="4,10,4,10" />
+
+                <NavigationViewItem x:Name="SettingsItem" Tag="settings"
+                                    AutomationProperties.Name="Settings">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE713;" FontSize="16" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.Content>
+                        <TextBlock Text="Settings" FontSize="14"
+                                   FontFamily="Inter, Segoe UI Variable Text, Segoe UI" />
+                    </NavigationViewItem.Content>
+                </NavigationViewItem>
+
+                <NavigationViewItem x:Name="HelpItem" Tag="help"
+                                    AutomationProperties.Name="Help">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE897;" FontSize="16" />
+                    </NavigationViewItem.Icon>
+                    <NavigationViewItem.Content>
+                        <TextBlock Text="Help" FontSize="14"
+                                   FontFamily="Inter, Segoe UI Variable Text, Segoe UI" />
+                    </NavigationViewItem.Content>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <NavigationView.PaneFooter>
+                <StackPanel Margin="16,20,16,20" Spacing="10">
+                    <Border Style="{StaticResource AppPill}">
+                        <TextBlock x:Name="ElevationBadge"
+                                   FontFamily="Inter, Segoe UI Variable Text, Segoe UI"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource AppTextSecondaryBrush}" />
+                    </Border>
+                    <TextBlock Text="Scanning never deletes."
+                               FontFamily="Inter, Segoe UI Variable Text, Segoe UI"
+                               FontSize="12"
+                               LineHeight="17"
+                               Foreground="{ThemeResource AppTextTertiaryBrush}"
+                               Margin="2,0,0,0"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </NavigationView.PaneFooter>
+
+            <!-- The content sheet. One hairline separates it from the pane; nothing else. -->
+            <Border Background="{ThemeResource AppBackgroundBrush}"
+                    BorderBrush="{ThemeResource AppBorderBrush}"
+                    BorderThickness="1,0,0,0">
+                <Frame x:Name="ContentFrame" />
+            </Border>
+        </NavigationView>
+    </Grid>
+</Window>

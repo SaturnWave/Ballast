@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The type ramp.
+
+    Six sizes, two weights. Since the palette gives colour almost nothing to do, type carries
+    the hierarchy: a page is a big semibold title, a quiet secondary line, then 14px body.
+
+    Line height sits at roughly 1.45x on everything that can run to more than one line. That
+    single number does more for how calm the app feels than any other value in these files.
+
+    Font stack: Inter if the user has it, otherwise the Windows 11 variable faces. Titles use
+    the Display face (tighter tracking at large sizes), body copy uses Text.
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <FontFamily x:Key="AppTextFontFamily">Inter, Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="AppDisplayFontFamily">Inter, Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="AppIconFontFamily">Segoe Fluent Icons</FontFamily>
+
+    <!-- 30 / Semibold - the page title, one per page. -->
+    <Style x:Key="TextTitleLarge" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Display, Segoe UI" />
+        <Setter Property="FontSize" Value="30" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="LineHeight" Value="38" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextBrush}" />
+    </Style>
+
+    <!-- 21 / Semibold - a heading inside the page. -->
+    <Style x:Key="TextTitle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Display, Segoe UI" />
+        <Setter Property="FontSize" Value="21" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="LineHeight" Value="28" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextBrush}" />
+    </Style>
+
+    <!-- 16 / Semibold - a row that carries weight, a figure worth reading. -->
+    <Style x:Key="TextHeadline" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="LineHeight" Value="22" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextBrush}" />
+    </Style>
+
+    <!-- 14 / Regular - the default. Nearly every label in the app is this. -->
+    <Style x:Key="TextBody" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="LineHeight" Value="20" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextBrush}" />
+    </Style>
+
+    <!-- 13 - supporting copy: subtitles, values, explanations. -->
+    <Style x:Key="TextSecondary" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="LineHeight" Value="19" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextSecondaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- 12 - paths, counts, anything the eye should be able to skip. -->
+    <Style x:Key="TextCaption" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="LineHeight" Value="17" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextTertiaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!--
+        40 / Semibold - the one number a page is actually about (reclaimable bytes, free space).
+        An extension to the six-step ramp: a hero figure this size is a graphic, not a heading,
+        and there is at most one per page.
+    -->
+    <Style x:Key="TextDisplay" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Inter, Segoe UI Variable Display, Segoe UI" />
+        <Setter Property="FontSize" Value="40" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="LineHeight" Value="46" />
+        <Setter Property="Foreground" Value="{ThemeResource AppTextBrush}" />
+    </Style>
+
+    <!-- =====================================================================
+         Legacy iOS type styles, aliased onto the ramp above.
+
+         DiskSpacePage is still on these keys while another agent re-skins it;
+         pointing them at the new styles keeps that page consistent in the
+         meantime. Delete this block once nothing references it.
+         ===================================================================== -->
+    <Style x:Key="IosLargeTitle" TargetType="TextBlock" BasedOn="{StaticResource TextTitleLarge}" />
+    <Style x:Key="IosTitle3" TargetType="TextBlock" BasedOn="{StaticResource TextTitle}" />
+    <Style x:Key="IosHeadline" TargetType="TextBlock" BasedOn="{StaticResource TextHeadline}" />
+    <Style x:Key="IosBody" TargetType="TextBlock" BasedOn="{StaticResource TextBody}" />
+    <Style x:Key="IosFootnote" TargetType="TextBlock" BasedOn="{StaticResource TextSecondary}" />
+    <Style x:Key="IosCaption" TargetType="TextBlock" BasedOn="{StaticResource TextCaption}" />
+
+</ResourceDictionary>

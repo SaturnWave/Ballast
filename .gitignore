@@ -1,0 +1,22 @@
+# Build output. None of this is source, and indexing it is actively harmful:
+# obj/ alone contributed 1863 of 3808 nodes to the first knowledge-graph build,
+# burying the 1221 real ones.
+bin/
+obj/
+
+# The published, self-contained app (~224 MB of runtime and framework binaries).
+app/
+dist/
+
+# Knowledge graph. Rebuildable from source in ~35s, and graph.json is ~4.6 MB.
+graphify-out/
+
+# Visual Studio / Rider local state.
+.vs/
+.idea/
+*.user
+*.suo
+
+# Generated icon artefacts. tools/make-icon.ps1 regenerates both.
+Ballast.App/Assets/AppIcon-256.png
+tools/logo-candidates.png

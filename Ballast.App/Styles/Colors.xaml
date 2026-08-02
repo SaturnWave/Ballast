@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The Ballast palette.
+
+    Warm paper in light, graphite in dark, one muted indigo accent. Colour is deliberately
+    scarce: hierarchy comes from type size, weight and whitespace, and the accent is spent
+    only on the single most important thing on screen. Everything structural is a hairline.
+
+    Every brush is looked up with {ThemeResource ...}, so switching the window's RequestedTheme
+    swaps the whole palette at runtime.
+
+    Naming contract (shared with the risk and treemap work):
+      AppBackground / AppSurface / AppSurfaceRaised   surfaces, back to front
+      AppBorder                                       the only structural line in the app
+      AppText / AppTextSecondary / AppTextTertiary    the three text levels
+      AppAccent (+Hover/+Pressed/+OnAccent)           one accent, nothing else tinted
+      AppDanger (+Subtle/+OnDanger)                   destructive only
+      Risk1..Risk5                                    the five-step risk ramp, 1 = never delete
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ResourceDictionary.ThemeDictionaries>
+
+        <!-- ==================================================================== LIGHT -->
+        <ResourceDictionary x:Key="Light">
+
+            <!-- Surfaces, back to front. -->
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FAF9F5" />
+            <SolidColorBrush x:Key="AppSurfaceBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AppSurfaceRaisedBrush" Color="#F4F3EF" />
+
+            <!-- The hairline. One weight, one colour, everywhere. -->
+            <SolidColorBrush x:Key="AppBorderBrush" Color="#E3E1DA" />
+
+            <!-- Text, three levels. -->
+            <SolidColorBrush x:Key="AppTextBrush" Color="#1C1B19" />
+            <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#6B6862" />
+            <SolidColorBrush x:Key="AppTextTertiaryBrush" Color="#9A968E" />
+
+            <!-- The one accent. -->
+            <SolidColorBrush x:Key="AppAccentBrush" Color="#4F46B8" />
+            <SolidColorBrush x:Key="AppAccentHoverBrush" Color="#5B52C6" />
+            <SolidColorBrush x:Key="AppAccentPressedBrush" Color="#423AA0" />
+            <SolidColorBrush x:Key="AppAccentSubtleBrush" Color="#4F46B8" Opacity="0.10" />
+            <SolidColorBrush x:Key="AppOnAccentBrush" Color="#FFFFFF" />
+
+            <!-- Destructive. -->
+            <SolidColorBrush x:Key="AppDangerBrush" Color="#B3261E" />
+            <SolidColorBrush x:Key="AppDangerSubtleBrush" Color="#B3261E" Opacity="0.10" />
+            <SolidColorBrush x:Key="AppOnDangerBrush" Color="#FFFFFF" />
+
+            <!-- Pointer feedback. Neutral ink washes, so they read the same over any fill. -->
+            <SolidColorBrush x:Key="AppHoverBrush" Color="#1C1B19" Opacity="0.045" />
+            <SolidColorBrush x:Key="AppPressedBrush" Color="#1C1B19" Opacity="0.085" />
+
+            <!-- Risk ramp. Identical in both themes: these are a shared vocabulary, and a
+                 category that reads "never delete" must look the same wherever it appears. -->
+            <SolidColorBrush x:Key="Risk1Brush" Color="#B3261E" />
+            <SolidColorBrush x:Key="Risk2Brush" Color="#D4761F" />
+            <SolidColorBrush x:Key="Risk3Brush" Color="#C9A227" />
+            <SolidColorBrush x:Key="Risk4Brush" Color="#6E8B3D" />
+            <SolidColorBrush x:Key="Risk5Brush" Color="#3F7D58" />
+
+            <!-- Fluent CheckBox retint. Brush keys only: the stock template is untouched. -->
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillChecked" Color="#4F46B8" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeChecked" Color="#4F46B8" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" Color="#5B52C6" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" Color="#5B52C6" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPressed" Color="#423AA0" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedPressed" Color="#423AA0" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillIndeterminate" Color="#4F46B8" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeIndeterminate" Color="#4F46B8" />
+            <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundChecked" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundIndeterminate" Color="#FFFFFF" />
+
+            <!--
+                Fluent ToggleSwitch retint. Brush keys only, for the same reason as the
+                CheckBox above: the stock template stays stock. See Controls.xaml for the
+                long version of why nobody should hand-write a ToggleSwitch template here.
+            -->
+            <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="#4F46B8" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#5B52C6" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="#423AA0" />
+            <SolidColorBrush x:Key="ToggleSwitchStrokeOn" Color="#4F46B8" />
+            <SolidColorBrush x:Key="ToggleSwitchStrokeOnPointerOver" Color="#5B52C6" />
+            <SolidColorBrush x:Key="ToggleSwitchStrokeOnPressed" Color="#423AA0" />
+
+            <!--
+                Everything still wearing stock Fluent - the ContentDialog primary button, focus
+                rings, selection indicators - reads the Windows accent colour through these three
+                keys. Repointing them is what stops a system-blue button turning up in the middle
+                of an indigo app. Brush keys only; no template is replaced.
+            -->
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#4F46B8" />
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#5B52C6" />
+            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#423AA0" />
+            <SolidColorBrush x:Key="AccentButtonBackground" Color="#4F46B8" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPointerOver" Color="#5B52C6" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPressed" Color="#423AA0" />
+            <SolidColorBrush x:Key="AccentButtonBorderBrush" Color="#4F46B8" />
+            <SolidColorBrush x:Key="AccentButtonForeground" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPointerOver" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPressed" Color="#FFFFFF" />
+
+            <!--
+                Legacy iOS keys. Still referenced by DiskSpacePage, which another agent is
+                migrating; they are pointed at the new palette so that page does not read as
+                a different app in the meantime. Delete this block once that page is moved.
+            -->
+            <SolidColorBrush x:Key="IosTertiaryLabelBrush" Color="#9A968E" />
+            <SolidColorBrush x:Key="IosTertiaryBackgroundBrush" Color="#F4F3EF" />
+            <SolidColorBrush x:Key="IosRedBrush" Color="#B3261E" />
+            <SolidColorBrush x:Key="IosOrangeBrush" Color="#D4761F" />
+
+        </ResourceDictionary>
+
+        <!-- ===================================================================== DARK -->
+        <ResourceDictionary x:Key="Dark">
+
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#17161A" />
+            <SolidColorBrush x:Key="AppSurfaceBrush" Color="#1F1E23" />
+            <SolidColorBrush x:Key="AppSurfaceRaisedBrush" Color="#27262C" />
+
+            <SolidColorBrush x:Key="AppBorderBrush" Color="#33323A" />
+
+            <SolidColorBrush x:Key="AppTextBrush" Color="#F2F1EC" />
+            <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#A5A29B" />
+            <SolidColorBrush x:Key="AppTextTertiaryBrush" Color="#75726B" />
+
+            <SolidColorBrush x:Key="AppAccentBrush" Color="#7C74DC" />
+            <SolidColorBrush x:Key="AppAccentHoverBrush" Color="#8B84E4" />
+            <SolidColorBrush x:Key="AppAccentPressedBrush" Color="#6A62C8" />
+            <SolidColorBrush x:Key="AppAccentSubtleBrush" Color="#7C74DC" Opacity="0.18" />
+
+            <!-- Ink, not white: white on the lightened dark-theme accent is only 3.9:1, which
+                 fails AA for a 14px label. The near-black reads at 4.6:1. -->
+            <SolidColorBrush x:Key="AppOnAccentBrush" Color="#17161A" />
+
+            <SolidColorBrush x:Key="AppDangerBrush" Color="#F2857C" />
+            <SolidColorBrush x:Key="AppDangerSubtleBrush" Color="#F2857C" Opacity="0.16" />
+            <SolidColorBrush x:Key="AppOnDangerBrush" Color="#17161A" />
+
+            <SolidColorBrush x:Key="AppHoverBrush" Color="#FFFFFF" Opacity="0.06" />
+            <SolidColorBrush x:Key="AppPressedBrush" Color="#FFFFFF" Opacity="0.10" />
+
+            <SolidColorBrush x:Key="Risk1Brush" Color="#B3261E" />
+            <SolidColorBrush x:Key="Risk2Brush" Color="#D4761F" />
+            <SolidColorBrush x:Key="Risk3Brush" Color="#C9A227" />
+            <SolidColorBrush x:Key="Risk4Brush" Color="#6E8B3D" />
+            <SolidColorBrush x:Key="Risk5Brush" Color="#3F7D58" />
+
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillChecked" Color="#7C74DC" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeChecked" Color="#7C74DC" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" Color="#8B84E4" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" Color="#8B84E4" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPressed" Color="#6A62C8" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedPressed" Color="#6A62C8" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillIndeterminate" Color="#7C74DC" />
+            <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeIndeterminate" Color="#7C74DC" />
+            <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundChecked" Color="#17161A" />
+            <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundIndeterminate" Color="#17161A" />
+
+            <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="#7C74DC" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#8B84E4" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="#6A62C8" />
+            <SolidColorBrush x:Key="ToggleSwitchStrokeOn" Color="#7C74DC" />
+            <SolidColorBrush x:Key="ToggleSwitchStrokeOnPointerOver" Color="#8B84E4" />
+            <SolidColorBrush x:Key="ToggleSwitchStrokeOnPressed" Color="#6A62C8" />
+
+            <!-- Stock Fluent accent; see the note in the Light dictionary. -->
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#7C74DC" />
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#8B84E4" />
+            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#6A62C8" />
+            <SolidColorBrush x:Key="AccentButtonBackground" Color="#7C74DC" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPointerOver" Color="#8B84E4" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPressed" Color="#6A62C8" />
+            <SolidColorBrush x:Key="AccentButtonBorderBrush" Color="#7C74DC" />
+            <SolidColorBrush x:Key="AccentButtonForeground" Color="#17161A" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPointerOver" Color="#17161A" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPressed" Color="#17161A" />
+
+            <!-- Legacy iOS keys; see the note in the Light dictionary. -->
+            <SolidColorBrush x:Key="IosTertiaryLabelBrush" Color="#75726B" />
+            <SolidColorBrush x:Key="IosTertiaryBackgroundBrush" Color="#27262C" />
+            <SolidColorBrush x:Key="IosRedBrush" Color="#F2857C" />
+            <SolidColorBrush x:Key="IosOrangeBrush" Color="#D4761F" />
+
+        </ResourceDictionary>
+
+        <!-- ============================================================ HIGH CONTRAST -->
+        <ResourceDictionary x:Key="HighContrast">
+
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="AppSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="AppSurfaceRaisedBrush" Color="{ThemeResource SystemColorButtonFaceColor}" />
+
+            <SolidColorBrush x:Key="AppBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+
+            <SolidColorBrush x:Key="AppTextBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="AppTextTertiaryBrush" Color="{ThemeResource SystemColorGrayTextColor}" />
+
+            <SolidColorBrush x:Key="AppAccentBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="AppAccentHoverBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="AppAccentPressedBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="AppAccentSubtleBrush" Color="{ThemeResource SystemColorButtonFaceColor}" />
+            <SolidColorBrush x:Key="AppOnAccentBrush" Color="{ThemeResource SystemColorHighlightTextColor}" />
+
+            <SolidColorBrush x:Key="AppDangerBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="AppDangerSubtleBrush" Color="{ThemeResource SystemColorButtonFaceColor}" />
+            <SolidColorBrush x:Key="AppOnDangerBrush" Color="{ThemeResource SystemColorHighlightTextColor}" />
+
+            <SolidColorBrush x:Key="AppHoverBrush" Color="{ThemeResource SystemColorHighlightColor}" Opacity="0.3" />
+            <SolidColorBrush x:Key="AppPressedBrush" Color="{ThemeResource SystemColorHighlightColor}" Opacity="0.5" />
+
+            <!-- The ramp collapses under high contrast; the user's colours win. Risk is still
+                 spelled out in words wherever it is shown, so no meaning is lost here. -->
+            <SolidColorBrush x:Key="Risk1Brush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="Risk2Brush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="Risk3Brush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="Risk4Brush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="Risk5Brush" Color="{ThemeResource SystemColorWindowTextColor}" />
+
+            <!-- Legacy iOS keys; see the note in the Light dictionary. -->
+            <SolidColorBrush x:Key="IosTertiaryLabelBrush" Color="{ThemeResource SystemColorGrayTextColor}" />
+            <SolidColorBrush x:Key="IosTertiaryBackgroundBrush" Color="{ThemeResource SystemColorButtonFaceColor}" />
+            <SolidColorBrush x:Key="IosRedBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="IosOrangeBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

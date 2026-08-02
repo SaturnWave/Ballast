@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+    <RootNamespace>Ballast.App</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <SelfContained>true</SelfContained>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+
+    <!-- The app icon, shown on the exe, the taskbar and the desktop shortcut. -->
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+
+    <!--
+      Suppresses the entry point the XAML compiler generates, so Program.cs can provide its own.
+      That is the only place a single-instance redirect can happen — by the time App.OnLaunched
+      runs, this process has already committed to being an app instance.
+    -->
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+
+    <!--
+      Required by Microsoft.WindowsAppSDK even for an UNPACKAGED app: the MSIX tooling is what
+      generates the embedded resources.pri that XAML needs at runtime. Without it,
+      PublishSingleFile fails outright. It does not make the app packaged —
+      WindowsPackageType stays None.
+    -->
+    <EnableMsixTooling>true</EnableMsixTooling>
+
+    <!--
+      MVVMTK0045 advises replacing [ObservableProperty] fields with partial properties for
+      AOT-compatible WinRT marshalling. We deliberately keep the field form:
+
+        * This app ships self-contained JIT, not Native AOT, so the marshalling path the
+          warning refers to is never taken.
+        * The partial-property form does not work on this toolchain — CommunityToolkit.Mvvm
+          8.4.0's generator emits no implementation part under the .NET 10 SDK's Roslyn,
+          producing CS9248 for every property. Verified, not assumed.
+
+      Revisit if we ever enable PublishAot, or when the Toolkit ships a generator that
+      handles partial properties here.
+    -->
+    <NoWarn>$(NoWarn);MVVMTK0045</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ballast.Core\Ballast.Core.csproj" />
+  </ItemGroup>
+</Project>
