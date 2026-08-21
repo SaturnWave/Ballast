@@ -124,9 +124,17 @@ dotnet build Ballast.slnx
 dotnet test Ballast.Tests/Ballast.Tests.csproj
 ```
 
+To build and start it in one step:
+
 ```bash
-dotnet run --project Ballast.App
+powershell -ExecutionPolicy Bypass -File run.ps1
 ```
+
+**`dotnet run --project Ballast.App` does not work here**, and the reason is worth knowing:
+`app.manifest` requests `requireAdministrator`, but `dotnet run` starts the process without
+`UseShellExecute`, so Windows cannot raise a UAC prompt and fails immediately with *"The requested
+operation requires elevation."* `run.ps1` starts the app with `-Verb RunAs` instead, which prompts
+properly. From a terminal that is already elevated, plain `dotnet run` is fine.
 
 The app is **unpackaged and self-contained** (`WindowsPackageType=None`,
 `WindowsAppSDKSelfContained=true`), so it needs no MSIX signing and no separately installed
