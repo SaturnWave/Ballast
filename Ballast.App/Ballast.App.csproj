@@ -34,6 +34,22 @@
     <EnableMsixTooling>true</EnableMsixTooling>
 
     <!--
+      Keeps the platform out of the obj/ and bin/ paths.
+
+      The solution pins this project to x64, which otherwise makes MSBuild build into
+      obj\x64\... . The WinUI XAML compiler resolves that path differently between its two
+      markup passes, so a COLD build through the solution fails outright:
+
+          XamlCompiler error WMC1006: Cannot resolve Assembly or Windows Metadata file
+          'obj\x64\Debug\...\intermediatexaml\Ballast.App.dll'
+
+      This never showed up here because an existing obj/ hid it — the failure only appears on a
+      fresh clone, which is exactly what anyone else gets. Building the csproj directly always
+      worked, because that path carries no platform segment; this makes the solution match.
+    -->
+    <AppendPlatformToOutputPath>false</AppendPlatformToOutputPath>
+
+    <!--
       MVVMTK0045 advises replacing [ObservableProperty] fields with partial properties for
       AOT-compatible WinRT marshalling. We deliberately keep the field form:
 

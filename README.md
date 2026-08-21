@@ -109,6 +109,10 @@ immediately; scheduled tasks fold in when they arrive.
 
 ## Build and run
 
+**Prerequisites: the .NET 10 SDK, and nothing else.** Check with `dotnet --list-sdks`; you need a
+`10.0.x` line. Visual Studio is optional and the WinUI project templates are *not* needed. Windows
+10 build 19041 or later, on x64.
+
 Requires the .NET 10 SDK. The WinUI project templates are *not* required — the app builds from
 the CLI via the `Microsoft.WindowsAppSDK` NuGet package.
 
@@ -130,6 +134,19 @@ Windows App Runtime.
 
 `NuGet.config` pins restore to nuget.org only, so an unreachable private feed configured
 machine-wide cannot break the build.
+
+### If a fresh clone will not build
+
+Two things have actually caught people out:
+
+**`XamlCompiler error WMC1006: Cannot resolve ... intermediatexaml\Ballast.App.dll`** — this was a
+real defect in the project file, fixed by `AppendPlatformToOutputPath` in `Ballast.App.csproj`. The
+solution pinned the project to x64, MSBuild moved the intermediates to `obj\x64\...`, and the XAML
+compiler's second pass looked somewhere else. It was invisible to anyone with an existing `obj/`
+and hit everyone cloning fresh. If you see it, you are on a commit older than that fix; pull.
+
+**`The current .NET SDK does not support targeting net10.0`** — you are on an older SDK. Install the
+.NET 10 SDK; side-by-side installs are fine and will not disturb existing projects.
 
 ### Elevation
 
